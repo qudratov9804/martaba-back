@@ -6,12 +6,19 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Media\MediaController;
 use App\Http\Controllers\Api\V1\Public\CategoryController as PublicCategoryController;
 use App\Http\Controllers\Api\V1\Public\CourseController as PublicCourseController;
+use App\Http\Controllers\Api\V1\Student\AssignmentController as StudentAssignmentController;
 use App\Http\Controllers\Api\V1\Student\EnrollmentController;
 use App\Http\Controllers\Api\V1\Student\FavoriteController;
 use App\Http\Controllers\Api\V1\Student\LearningController;
+use App\Http\Controllers\Api\V1\Student\QuizAttemptController;
+use App\Http\Controllers\Api\V1\Teacher\AssignmentController as TeacherAssignmentController;
+use App\Http\Controllers\Api\V1\Teacher\AssignmentSubmissionController;
 use App\Http\Controllers\Api\V1\Teacher\ContentController;
 use App\Http\Controllers\Api\V1\Teacher\CourseController as TeacherCourseController;
 use App\Http\Controllers\Api\V1\Teacher\LessonController;
+use App\Http\Controllers\Api\V1\Teacher\QuestionController;
+use App\Http\Controllers\Api\V1\Teacher\QuizAnswerController;
+use App\Http\Controllers\Api\V1\Teacher\QuizController as TeacherQuizController;
 use App\Http\Controllers\Api\V1\Teacher\SectionController;
 use App\Http\Controllers\Api\V1\Teacher\StudentController as TeacherStudentController;
 use Illuminate\Support\Facades\Route;
@@ -62,6 +69,27 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::delete('contents/{content}', [ContentController::class, 'destroy'])->name('contents.destroy');
 
             Route::get('courses/{course}/students', [TeacherStudentController::class, 'index'])->name('students.index');
+
+            Route::get('courses/{course}/quizzes', [TeacherQuizController::class, 'index'])->name('quizzes.index');
+            Route::post('courses/{course}/quizzes', [TeacherQuizController::class, 'store'])->name('quizzes.store');
+            Route::get('quizzes/{quiz}', [TeacherQuizController::class, 'show'])->name('quizzes.show');
+            Route::put('quizzes/{quiz}', [TeacherQuizController::class, 'update'])->name('quizzes.update');
+            Route::delete('quizzes/{quiz}', [TeacherQuizController::class, 'destroy'])->name('quizzes.destroy');
+
+            Route::post('quizzes/{quiz}/questions', [QuestionController::class, 'store'])->name('questions.store');
+            Route::put('questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
+            Route::delete('questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+
+            Route::post('quiz-answers/{answer}/grade', [QuizAnswerController::class, 'grade'])->name('quiz-answers.grade');
+
+            Route::get('courses/{course}/assignments', [TeacherAssignmentController::class, 'index'])->name('assignments.index');
+            Route::post('courses/{course}/assignments', [TeacherAssignmentController::class, 'store'])->name('assignments.store');
+            Route::get('assignments/{assignment}', [TeacherAssignmentController::class, 'show'])->name('assignments.show');
+            Route::put('assignments/{assignment}', [TeacherAssignmentController::class, 'update'])->name('assignments.update');
+            Route::delete('assignments/{assignment}', [TeacherAssignmentController::class, 'destroy'])->name('assignments.destroy');
+
+            Route::get('assignments/{assignment}/submissions', [AssignmentSubmissionController::class, 'index'])->name('assignments.submissions.index');
+            Route::post('assignment-submissions/{submission}/grade', [AssignmentSubmissionController::class, 'grade'])->name('assignment-submissions.grade');
         });
 
         Route::prefix('student')->name('student.')->group(function () {
@@ -78,6 +106,15 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
             Route::post('favorites/{course}', [FavoriteController::class, 'store'])->name('favorites.store');
             Route::delete('favorites/{course}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+
+            Route::post('quizzes/{quiz}/attempts', [QuizAttemptController::class, 'store'])->name('quiz-attempts.store');
+            Route::get('quiz-attempts/{attempt}', [QuizAttemptController::class, 'show'])->name('quiz-attempts.show');
+            Route::post('quiz-attempts/{attempt}/answer', [QuizAttemptController::class, 'answer'])->name('quiz-attempts.answer');
+            Route::post('quiz-attempts/{attempt}/submit', [QuizAttemptController::class, 'submit'])->name('quiz-attempts.submit');
+
+            Route::get('assignments', [StudentAssignmentController::class, 'index'])->name('assignments.index');
+            Route::post('assignments/{assignment}/submit', [StudentAssignmentController::class, 'submit'])->name('assignments.submit');
+            Route::get('submissions/{submission}', [StudentAssignmentController::class, 'showSubmission'])->name('submissions.show');
         });
 
         Route::prefix('media')->name('media.')->group(function () {

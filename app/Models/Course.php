@@ -121,6 +121,22 @@ class Course extends Model
         return $this->hasMany(Favorite::class);
     }
 
+    /**
+     * @return HasMany<Quiz, $this>
+     */
+    public function quizzes(): HasMany
+    {
+        return $this->hasMany(Quiz::class);
+    }
+
+    /**
+     * @return HasMany<Assignment, $this>
+     */
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(Assignment::class);
+    }
+
     public function isOwnedBy(User $user): bool
     {
         return $this->created_by === $user->id
