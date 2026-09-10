@@ -1,5 +1,8 @@
 <?php
 
+use App\Enums\RoleName;
+use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,7 +47,42 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function actingAsSuperAdmin(?Organization $organization = null): User
 {
-    // ..
+    $user = User::factory()->create(['organization_id' => $organization?->id]);
+    $user->assignRole(RoleName::SuperAdmin->value);
+
+    return $user;
+}
+
+function actingAsTeacher(?Organization $organization = null): User
+{
+    $user = User::factory()->create(['organization_id' => $organization?->id ?? Organization::factory()]);
+    $user->assignRole(RoleName::Teacher->value);
+
+    return $user;
+}
+
+function actingAsStudent(?Organization $organization = null): User
+{
+    $user = User::factory()->create(['organization_id' => $organization?->id ?? Organization::factory()]);
+    $user->assignRole(RoleName::Student->value);
+
+    return $user;
+}
+
+/**
+ * Sanctum's guard caches the resolved user on the guard instance, which
+ * persists across sequential requests within a single test (they share
+ * the same application container). Without forgetting guards here, a
+ * second request authenticated as a different user would silently keep
+ * resolving to whichever user was authenticated first.
+ *
+ * @return array<string, string>
+ */
+function bearerHeaderFor(User $user): array
+{
+    app('auth')->forgetGuards();
+
+    return ['Authorization' => 'Bearer '.$user->createToken('test')->plainTextToken];
 }

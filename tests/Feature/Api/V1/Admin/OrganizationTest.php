@@ -9,19 +9,6 @@ beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
 });
 
-function actingAsSuperAdmin(): User
-{
-    $user = User::factory()->create();
-    $user->assignRole(RoleName::SuperAdmin->value);
-
-    return $user;
-}
-
-function bearerHeaderFor(User $user): array
-{
-    return ['Authorization' => 'Bearer '.$user->createToken('test')->plainTextToken];
-}
-
 test('a super admin can list organizations', function () {
     $admin = actingAsSuperAdmin();
     Organization::factory()->count(3)->create();
