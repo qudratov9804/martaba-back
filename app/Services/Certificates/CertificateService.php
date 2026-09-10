@@ -5,6 +5,8 @@ namespace App\Services\Certificates;
 use App\Enums\CertificateStatus;
 use App\Models\Certificate;
 use App\Models\Enrollment;
+use App\Models\User;
+use App\Services\Audit\AuditLogger;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
@@ -13,6 +15,8 @@ use Illuminate\Support\Str;
 
 class CertificateService
 {
+    public function __construct(private readonly AuditLogger $auditLogger) {}
+
     /**
      * Issue a certificate for a completed enrollment. Idempotent: if an
      * issued certificate already exists for this enrollment, it is returned
@@ -63,16 +67,24 @@ class CertificateService
         return $certificate;
     }
 
-    public function revoke(Certificate $certificate): Certificate
+    public function revoke(Certificate $certificate, ?User $actor = null): Certificate
     {
         $certificate->update(['status' => CertificateStatus::Revoked]);
+
+        $this->auditLogger->record(
+            $actor,
+            'certificate.revoked',
+            $certificate,
+            ['status' => CertificateStatus::Issued->value],
+            ['status' => CertificateStatus::Revoked->value],
+        );
 
         return $certificate;
     }
 
-    public function reissue(Certificate $certificate): Certificate
+    public function reissue(Certificate $certificate, ?User $actor = null): Certificate
     {
-        $this->revoke($certificate);
+        $this->revoke($certificate, $actor);
 
         return $this->issue($certificate->enrollment)
             ?? throw new \RuntimeException('Cannot reissue a certificate for a course with certificates disabled.');

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\AnalyticsController as AdminAnalyticsController;
+use App\Http\Controllers\Api\V1\Admin\AuditLogController;
 use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\CertificateController as AdminCertificateController;
 use App\Http\Controllers\Api\V1\Admin\CouponController as AdminCouponController;
@@ -20,6 +22,7 @@ use App\Http\Controllers\Api\V1\Student\FavoriteController;
 use App\Http\Controllers\Api\V1\Student\LearningController;
 use App\Http\Controllers\Api\V1\Student\OrderController as StudentOrderController;
 use App\Http\Controllers\Api\V1\Student\QuizAttemptController;
+use App\Http\Controllers\Api\V1\Teacher\AnalyticsController as TeacherAnalyticsController;
 use App\Http\Controllers\Api\V1\Teacher\AssignmentController as TeacherAssignmentController;
 use App\Http\Controllers\Api\V1\Teacher\AssignmentSubmissionController;
 use App\Http\Controllers\Api\V1\Teacher\ContentController;
@@ -73,6 +76,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::get('certificates/{certificate}', [AdminCertificateController::class, 'show'])->name('certificates.show');
             Route::post('certificates/{certificate}/revoke', [AdminCertificateController::class, 'revoke'])->name('certificates.revoke');
             Route::post('certificates/{certificate}/reissue', [AdminCertificateController::class, 'reissue'])->name('certificates.reissue');
+
+            Route::get('analytics/overview', [AdminAnalyticsController::class, 'overview'])->name('analytics.overview');
+            Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         });
 
         Route::prefix('teacher')->name('teacher.')->group(function () {
@@ -117,6 +123,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
             Route::get('assignments/{assignment}/submissions', [AssignmentSubmissionController::class, 'index'])->name('assignments.submissions.index');
             Route::post('assignment-submissions/{submission}/grade', [AssignmentSubmissionController::class, 'grade'])->name('assignment-submissions.grade');
+
+            Route::get('analytics/overview', [TeacherAnalyticsController::class, 'overview'])->name('analytics.overview');
+            Route::get('analytics/revenue', [TeacherAnalyticsController::class, 'revenue'])->name('analytics.revenue');
+            Route::get('analytics/courses/{course}', [TeacherAnalyticsController::class, 'course'])->name('analytics.courses');
         });
 
         Route::prefix('student')->name('student.')->group(function () {

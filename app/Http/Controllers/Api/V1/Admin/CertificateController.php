@@ -32,20 +32,20 @@ class CertificateController extends Controller
         return ApiResponse::success(new CertificateResource($certificate), 'Certificate loaded.');
     }
 
-    public function revoke(Certificate $certificate, CertificateService $service): JsonResponse
+    public function revoke(Request $request, Certificate $certificate, CertificateService $service): JsonResponse
     {
         $this->authorize('revoke', $certificate);
 
-        $certificate = $service->revoke($certificate);
+        $certificate = $service->revoke($certificate, $request->user());
 
         return ApiResponse::success(new CertificateResource($certificate), 'Certificate revoked.');
     }
 
-    public function reissue(Certificate $certificate, CertificateService $service): JsonResponse
+    public function reissue(Request $request, Certificate $certificate, CertificateService $service): JsonResponse
     {
         $this->authorize('reissue', $certificate);
 
-        $certificate = $service->reissue($certificate);
+        $certificate = $service->reissue($certificate, $request->user());
 
         return ApiResponse::success(new CertificateResource($certificate), 'Certificate reissued.');
     }

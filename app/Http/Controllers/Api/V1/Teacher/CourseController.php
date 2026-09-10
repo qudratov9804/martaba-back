@@ -12,6 +12,7 @@ use App\Http\Requests\Teacher\StoreCourseRequest;
 use App\Http\Requests\Teacher\UpdateCourseRequest;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
+use App\Services\Audit\AuditLogger;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -59,20 +60,22 @@ class CourseController extends Controller
         return ApiResponse::success(new CourseResource($course), 'Course updated.');
     }
 
-    public function destroy(Course $course): JsonResponse
+    public function destroy(Request $request, Course $course, AuditLogger $auditLogger): JsonResponse
     {
         $this->authorize('delete', $course);
+
+        $auditLogger->record($request->user(), 'course.deleted', $course, ['title' => $course->title]);
 
         $course->delete();
 
         return ApiResponse::success(null, 'Course deleted.');
     }
 
-    public function publish(Course $course, PublishCourseAction $action): JsonResponse
+    public function publish(Request $request, Course $course, PublishCourseAction $action): JsonResponse
     {
         $this->authorize('publish', $course);
 
-        $course = $action->handle($course);
+        $course = $action->handle($course, $request->user());
 
         return ApiResponse::success(new CourseResource($course), 'Course published.');
     }

@@ -9,13 +9,17 @@ use App\Enums\RefundStatus;
 use App\Models\Payment;
 use App\Models\Refund;
 use App\Models\User;
+use App\Services\Audit\AuditLogger;
 use App\Services\Payments\PaymentGatewayManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class RequestRefundAction
 {
-    public function __construct(private readonly PaymentGatewayManager $gatewayManager) {}
+    public function __construct(
+        private readonly PaymentGatewayManager $gatewayManager,
+        private readonly AuditLogger $auditLogger,
+    ) {}
 
     public function handle(Payment $payment, User $requester, int $amountMinor, ?string $reason = null): Refund
     {
@@ -79,6 +83,14 @@ class RequestRefundAction
                 'processed_at' => now(),
                 'created_at' => now(),
             ]);
+
+            $this->auditLogger->record(
+                $requester,
+                'refund.processed',
+                $refund,
+                [],
+                ['amount_minor' => $amountMinor, 'payment_id' => $payment->id],
+            );
 
             return $refund;
         });
