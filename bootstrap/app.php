@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\InvalidWebhookSignatureException;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Support\ApiResponse;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -35,6 +36,10 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*') || $request->expectsJson()) {
                 return ApiResponse::error('Validation failed.', $e->errors(), 422);
             }
+        });
+
+        $exceptions->render(function (InvalidWebhookSignatureException $e, Request $request) {
+            return ApiResponse::error($e->getMessage(), [], 401);
         });
 
         $exceptions->render(function (AuthenticationException $e, Request $request) {

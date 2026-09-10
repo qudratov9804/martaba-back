@@ -44,4 +44,12 @@ class Enrollment extends Model
     {
         return $this->belongsTo(User::class, 'student_id');
     }
+
+    /**
+     * @return BelongsTo<Order, $this>
+     */
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

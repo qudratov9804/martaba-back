@@ -1,15 +1,21 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\V1\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\OrganizationController;
+use App\Http\Controllers\Api\V1\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Media\MediaController;
+use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\Public\CategoryController as PublicCategoryController;
 use App\Http\Controllers\Api\V1\Public\CourseController as PublicCourseController;
 use App\Http\Controllers\Api\V1\Student\AssignmentController as StudentAssignmentController;
+use App\Http\Controllers\Api\V1\Student\CheckoutController;
 use App\Http\Controllers\Api\V1\Student\EnrollmentController;
 use App\Http\Controllers\Api\V1\Student\FavoriteController;
 use App\Http\Controllers\Api\V1\Student\LearningController;
+use App\Http\Controllers\Api\V1\Student\OrderController as StudentOrderController;
 use App\Http\Controllers\Api\V1\Student\QuizAttemptController;
 use App\Http\Controllers\Api\V1\Teacher\AssignmentController as TeacherAssignmentController;
 use App\Http\Controllers\Api\V1\Teacher\AssignmentSubmissionController;
@@ -21,6 +27,7 @@ use App\Http\Controllers\Api\V1\Teacher\QuizAnswerController;
 use App\Http\Controllers\Api\V1\Teacher\QuizController as TeacherQuizController;
 use App\Http\Controllers\Api\V1\Teacher\SectionController;
 use App\Http\Controllers\Api\V1\Teacher\StudentController as TeacherStudentController;
+use App\Http\Controllers\Api\V1\Webhooks\PaymentWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
@@ -42,10 +49,20 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('courses/{slug}', [PublicCourseController::class, 'show'])->name('courses.show');
     });
 
+    Route::post('webhooks/payments/{provider}', [PaymentWebhookController::class, 'handle'])->name('webhooks.payments');
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('admin')->name('admin.')->group(function () {
             Route::apiResource('organizations', OrganizationController::class);
             Route::apiResource('categories', AdminCategoryController::class);
+            Route::apiResource('coupons', AdminCouponController::class);
+
+            Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
+            Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+
+            Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+            Route::get('payments/{payment}', [AdminPaymentController::class, 'show'])->name('payments.show');
+            Route::post('payments/{payment}/refund', [AdminPaymentController::class, 'refund'])->name('payments.refund');
         });
 
         Route::prefix('teacher')->name('teacher.')->group(function () {
@@ -115,7 +132,18 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::get('assignments', [StudentAssignmentController::class, 'index'])->name('assignments.index');
             Route::post('assignments/{assignment}/submit', [StudentAssignmentController::class, 'submit'])->name('assignments.submit');
             Route::get('submissions/{submission}', [StudentAssignmentController::class, 'showSubmission'])->name('submissions.show');
+
+            Route::get('orders', [StudentOrderController::class, 'index'])->name('orders.index');
+            Route::get('orders/{order}', [StudentOrderController::class, 'show'])->name('orders.show');
         });
+
+        Route::prefix('checkout')->name('checkout.')->group(function () {
+            Route::post('preview', [CheckoutController::class, 'preview'])->name('preview');
+            Route::post('orders', [CheckoutController::class, 'store'])->name('orders');
+        });
+
+        Route::post('orders/{order}/payments', [PaymentController::class, 'store'])->name('orders.payments.store');
+        Route::get('payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
 
         Route::prefix('media')->name('media.')->group(function () {
             Route::get('/', [MediaController::class, 'index'])->name('index');

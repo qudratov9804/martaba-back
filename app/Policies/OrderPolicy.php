@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Policies;
+
+use App\Enums\PermissionName;
+use App\Models\Order;
+use App\Models\User;
+
+class OrderPolicy
+{
+    public function view(User $user, Order $order): bool
+    {
+        return $order->student_id === $user->id || $user->can(PermissionName::OrdersView->value);
+    }
+}

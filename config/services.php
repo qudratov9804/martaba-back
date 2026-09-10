@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'manual_gateway' => [
+        'webhook_secret' => env('MANUAL_GATEWAY_WEBHOOK_SECRET', 'local-testing-secret'),
+    ],
+
 ];
