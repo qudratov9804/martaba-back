@@ -6,10 +6,14 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Media\MediaController;
 use App\Http\Controllers\Api\V1\Public\CategoryController as PublicCategoryController;
 use App\Http\Controllers\Api\V1\Public\CourseController as PublicCourseController;
+use App\Http\Controllers\Api\V1\Student\EnrollmentController;
+use App\Http\Controllers\Api\V1\Student\FavoriteController;
+use App\Http\Controllers\Api\V1\Student\LearningController;
 use App\Http\Controllers\Api\V1\Teacher\ContentController;
 use App\Http\Controllers\Api\V1\Teacher\CourseController as TeacherCourseController;
 use App\Http\Controllers\Api\V1\Teacher\LessonController;
 use App\Http\Controllers\Api\V1\Teacher\SectionController;
+use App\Http\Controllers\Api\V1\Teacher\StudentController as TeacherStudentController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
@@ -56,6 +60,24 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::post('lessons/{lesson}/contents', [ContentController::class, 'store'])->name('contents.store');
             Route::put('contents/{content}', [ContentController::class, 'update'])->name('contents.update');
             Route::delete('contents/{content}', [ContentController::class, 'destroy'])->name('contents.destroy');
+
+            Route::get('courses/{course}/students', [TeacherStudentController::class, 'index'])->name('students.index');
+        });
+
+        Route::prefix('student')->name('student.')->group(function () {
+            Route::get('enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
+            Route::get('enrollments/{enrollment}', [EnrollmentController::class, 'show'])->name('enrollments.show');
+            Route::post('courses/{course}/enroll', [EnrollmentController::class, 'store'])->name('enrollments.store');
+
+            Route::get('courses/{course}/learn', [LearningController::class, 'learn'])->name('learn');
+            Route::get('lessons/{lesson}', [LearningController::class, 'showLesson'])->name('lessons.show');
+            Route::post('lessons/{lesson}/start', [LearningController::class, 'start'])->name('lessons.start');
+            Route::post('lessons/{lesson}/progress', [LearningController::class, 'updateProgress'])->name('lessons.progress');
+            Route::post('lessons/{lesson}/complete', [LearningController::class, 'complete'])->name('lessons.complete');
+
+            Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+            Route::post('favorites/{course}', [FavoriteController::class, 'store'])->name('favorites.store');
+            Route::delete('favorites/{course}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
         });
 
         Route::prefix('media')->name('media.')->group(function () {

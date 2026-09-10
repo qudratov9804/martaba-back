@@ -105,6 +105,22 @@ class Course extends Model
         return $this->hasMany(CourseLesson::class);
     }
 
+    /**
+     * @return HasMany<Enrollment, $this>
+     */
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    /**
+     * @return HasMany<Favorite, $this>
+     */
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     public function isOwnedBy(User $user): bool
     {
         return $this->created_by === $user->id
