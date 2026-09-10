@@ -2,6 +2,7 @@
 
 namespace App\Actions\Quizzes;
 
+use App\Actions\Learning\EvaluateCourseCompletionAction;
 use App\Enums\QuizAttemptStatus;
 use App\Models\QuizAttempt;
 use App\Services\Quizzes\QuizGradingService;
@@ -10,7 +11,10 @@ use Illuminate\Validation\ValidationException;
 
 class SubmitQuizAttemptAction
 {
-    public function __construct(private readonly QuizGradingService $gradingService) {}
+    public function __construct(
+        private readonly QuizGradingService $gradingService,
+        private readonly EvaluateCourseCompletionAction $evaluateCourseCompletionAction,
+    ) {}
 
     public function handle(QuizAttempt $attempt): QuizAttempt
     {
@@ -20,7 +24,7 @@ class SubmitQuizAttemptAction
             ]);
         }
 
-        return DB::transaction(function () use ($attempt) {
+        $attempt = DB::transaction(function () use ($attempt) {
             $questions = $attempt->quiz->questions()->with('options')->get()->keyBy('id');
             $answers = $attempt->answers()->get();
 
@@ -58,5 +62,11 @@ class SubmitQuizAttemptAction
 
             return $attempt->fresh(['answers']);
         });
+
+        if ($attempt->status === QuizAttemptStatus::Graded) {
+            $this->evaluateCourseCompletionAction->handle($attempt->student, $attempt->quiz->course);
+        }
+
+        return $attempt;
     }
 }

@@ -10,7 +10,10 @@ use App\Services\Learning\CourseProgressService;
 
 class CompleteLessonAction
 {
-    public function __construct(private readonly CourseProgressService $courseProgressService) {}
+    public function __construct(
+        private readonly CourseProgressService $courseProgressService,
+        private readonly EvaluateCourseCompletionAction $evaluateCourseCompletionAction,
+    ) {}
 
     public function handle(User $student, CourseLesson $lesson): LessonProgress
     {
@@ -31,6 +34,7 @@ class CompleteLessonAction
         );
 
         $this->courseProgressService->recalculate($student, $lesson->course);
+        $this->evaluateCourseCompletionAction->handle($student, $lesson->course);
 
         return $progress->fresh();
     }

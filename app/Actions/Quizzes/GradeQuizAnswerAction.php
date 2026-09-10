@@ -2,11 +2,14 @@
 
 namespace App\Actions\Quizzes;
 
+use App\Actions\Learning\EvaluateCourseCompletionAction;
 use App\Enums\QuizAttemptStatus;
 use App\Models\QuizAnswer;
 
 class GradeQuizAnswerAction
 {
+    public function __construct(private readonly EvaluateCourseCompletionAction $evaluateCourseCompletionAction) {}
+
     public function handle(QuizAnswer $answer, float $pointsAwarded): QuizAnswer
     {
         $answer->update([
@@ -27,6 +30,8 @@ class GradeQuizAnswerAction
                 'percentage' => $percentage,
                 'graded_at' => now(),
             ]);
+
+            $this->evaluateCourseCompletionAction->handle($attempt->student, $attempt->quiz->course);
         }
 
         return $answer->fresh();

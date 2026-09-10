@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\V1\Admin\CertificateController as AdminCertificateController;
 use App\Http\Controllers\Api\V1\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\OrganizationController;
@@ -9,8 +10,10 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Media\MediaController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\Public\CategoryController as PublicCategoryController;
+use App\Http\Controllers\Api\V1\Public\CertificateController as PublicCertificateController;
 use App\Http\Controllers\Api\V1\Public\CourseController as PublicCourseController;
 use App\Http\Controllers\Api\V1\Student\AssignmentController as StudentAssignmentController;
+use App\Http\Controllers\Api\V1\Student\CertificateController as StudentCertificateController;
 use App\Http\Controllers\Api\V1\Student\CheckoutController;
 use App\Http\Controllers\Api\V1\Student\EnrollmentController;
 use App\Http\Controllers\Api\V1\Student\FavoriteController;
@@ -49,6 +52,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('courses/{slug}', [PublicCourseController::class, 'show'])->name('courses.show');
     });
 
+    Route::get('certificates/verify/{code}', [PublicCertificateController::class, 'verify'])->name('certificates.verify');
+
     Route::post('webhooks/payments/{provider}', [PaymentWebhookController::class, 'handle'])->name('webhooks.payments');
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -63,6 +68,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');
             Route::get('payments/{payment}', [AdminPaymentController::class, 'show'])->name('payments.show');
             Route::post('payments/{payment}/refund', [AdminPaymentController::class, 'refund'])->name('payments.refund');
+
+            Route::get('certificates', [AdminCertificateController::class, 'index'])->name('certificates.index');
+            Route::get('certificates/{certificate}', [AdminCertificateController::class, 'show'])->name('certificates.show');
+            Route::post('certificates/{certificate}/revoke', [AdminCertificateController::class, 'revoke'])->name('certificates.revoke');
+            Route::post('certificates/{certificate}/reissue', [AdminCertificateController::class, 'reissue'])->name('certificates.reissue');
         });
 
         Route::prefix('teacher')->name('teacher.')->group(function () {
@@ -135,6 +145,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
             Route::get('orders', [StudentOrderController::class, 'index'])->name('orders.index');
             Route::get('orders/{order}', [StudentOrderController::class, 'show'])->name('orders.show');
+
+            Route::get('certificates', [StudentCertificateController::class, 'index'])->name('certificates.index');
+            Route::get('certificates/{certificate}', [StudentCertificateController::class, 'show'])->name('certificates.show');
+            Route::get('certificates/{certificate}/download', [StudentCertificateController::class, 'download'])->name('certificates.download');
         });
 
         Route::prefix('checkout')->name('checkout.')->group(function () {

@@ -2,7 +2,6 @@
 
 namespace App\Services\Learning;
 
-use App\Enums\EnrollmentStatus;
 use App\Enums\LessonProgressStatus;
 use App\Models\Course;
 use App\Models\CourseProgress;
@@ -57,14 +56,10 @@ class CourseProgressService
             ]
         );
 
-        $isFullyComplete = $requiredLessonsTotal > 0 && $requiredLessonsCompleted >= $requiredLessonsTotal;
+        $allLessonsDone = $requiredLessonsTotal > 0 && $requiredLessonsCompleted >= $requiredLessonsTotal;
 
-        if ($isFullyComplete && ! $progress->completed_at) {
+        if ($allLessonsDone && ! $progress->completed_at) {
             $progress->update(['completed_at' => now()]);
-
-            $course->enrollments()
-                ->where('student_id', $student->id)
-                ->update(['status' => EnrollmentStatus::Completed, 'completed_at' => now()]);
         }
 
         return $progress;

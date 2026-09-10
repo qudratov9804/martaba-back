@@ -9,6 +9,8 @@ use App\Models\User;
 
 class UpdateLessonProgressAction
 {
+    public function __construct(private readonly EvaluateCourseCompletionAction $evaluateCourseCompletionAction) {}
+
     /**
      * @param  array{watch_seconds?: int, last_position_seconds?: int, progress_percent?: int}  $data
      */
@@ -27,6 +29,8 @@ class UpdateLessonProgressAction
                 ? LessonProgressStatus::InProgress
                 : $progress->status,
         ]);
+
+        $this->evaluateCourseCompletionAction->handle($student, $lesson->course);
 
         return $progress;
     }

@@ -66,4 +66,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class, 'student_id');
     }
+
+    /**
+     * @return HasMany<Certificate, $this>
+     */
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class, 'student_id');
+    }
 }
