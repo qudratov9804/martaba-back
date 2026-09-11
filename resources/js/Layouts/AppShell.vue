@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
+import FlashMessage from '@/Components/dashboard/FlashMessage.vue';
 import { useAuth } from '@/composables/useAuth';
 import {
     adminNavigation,
@@ -112,6 +113,7 @@ function initials(name: string): string {
             </header>
 
             <main class="flex-1 overflow-y-auto p-4 sm:p-6">
+                <FlashMessage />
                 <slot />
             </main>
         </div>

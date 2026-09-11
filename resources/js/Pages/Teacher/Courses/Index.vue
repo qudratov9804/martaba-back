@@ -3,6 +3,7 @@ import EmptyState from '@/Components/dashboard/EmptyState.vue';
 import PageHeader from '@/Components/dashboard/PageHeader.vue';
 import Pagination from '@/Components/dashboard/Pagination.vue';
 import { Badge } from '@/Components/ui/badge';
+import { Button } from '@/Components/ui/button';
 import { Card } from '@/Components/ui/card';
 import {
     Table,
@@ -15,8 +16,8 @@ import {
 import AppShell from '@/Layouts/AppShell.vue';
 import { formatMoney } from '@/lib/format';
 import type { Paginated } from '@/types/pagination';
-import { Head } from '@inertiajs/vue3';
-import { BookOpen } from 'lucide-vue-next';
+import { Head, Link } from '@inertiajs/vue3';
+import { BookOpen, Plus } from 'lucide-vue-next';
 
 interface Course {
     id: number;
@@ -48,7 +49,14 @@ function statusVariant(status: string) {
         <PageHeader
             title="My Courses"
             description="Courses you created or co-instruct."
-        />
+        >
+            <template #actions>
+                <Button :as="Link" :href="route('teacher.courses.create')">
+                    <Plus class="h-4 w-4" />
+                    New Course
+                </Button>
+            </template>
+        </PageHeader>
 
         <Card v-if="courses.data.length">
             <Table>

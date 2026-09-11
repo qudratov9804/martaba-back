@@ -54,6 +54,8 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])->prefix('admin')->na
 Route::middleware(['auth', 'verified', 'role:teacher'])->prefix('teacher')->name('teacher.')->group(function () {
     Route::get('/dashboard', [TeacherDashboardController::class, 'index'])->name('dashboard');
     Route::get('/courses', [TeacherCourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/create', [TeacherCourseController::class, 'create'])->name('courses.create');
+    Route::post('/courses', [TeacherCourseController::class, 'store'])->name('courses.store');
 });
 
 Route::middleware('auth')->group(function () {
