@@ -11,10 +11,10 @@
     },
     "framework": "vite",
     "aliases": {
-        "components": "@/components",
+        "components": "@/Components",
         "composables": "@/composables",
         "utils": "@/lib/utils",
-        "ui": "@/components/ui",
+        "ui": "@/Components/ui",
         "lib": "@/lib"
     },
     "iconLibrary": "lucide"

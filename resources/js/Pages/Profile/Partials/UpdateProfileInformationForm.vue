@@ -10,7 +10,8 @@ defineProps<{
     status?: String;
 }>();
 
-const user = usePage().props.auth.user;
+// This form only renders behind the `auth` middleware, so a user is always present.
+const user = usePage().props.auth.user!;
 
 const form = useForm({
     name: user.name,
