@@ -16,7 +16,7 @@ import {
 import AppShell from '@/Layouts/AppShell.vue';
 import { formatMoney } from '@/lib/format';
 import type { Paginated } from '@/types/pagination';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { BookOpen, Plus } from 'lucide-vue-next';
 
 interface Course {
@@ -69,7 +69,16 @@ function statusVariant(status: string) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="course in courses.data" :key="course.id">
+                    <TableRow
+                        v-for="course in courses.data"
+                        :key="course.id"
+                        class="cursor-pointer"
+                        @click="
+                            router.visit(
+                                route('teacher.courses.show', course.id),
+                            )
+                        "
+                    >
                         <TableCell class="font-medium">{{
                             course.title
                         }}</TableCell>

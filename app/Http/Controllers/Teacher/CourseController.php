@@ -57,4 +57,15 @@ class CourseController extends Controller
             ->route('teacher.courses.index')
             ->with('success', "\"{$course->title}\" was created as a draft.");
     }
+
+    public function show(Course $course): Response
+    {
+        $this->authorize('view', $course);
+
+        $course->load('sections.lessons');
+
+        return Inertia::render('Teacher/Courses/Show', [
+            'course' => $course,
+        ]);
+    }
 }

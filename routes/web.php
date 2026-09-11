@@ -56,6 +56,7 @@ Route::middleware(['auth', 'verified', 'role:teacher'])->prefix('teacher')->name
     Route::get('/courses', [TeacherCourseController::class, 'index'])->name('courses.index');
     Route::get('/courses/create', [TeacherCourseController::class, 'create'])->name('courses.create');
     Route::post('/courses', [TeacherCourseController::class, 'store'])->name('courses.store');
+    Route::get('/courses/{course}', [TeacherCourseController::class, 'show'])->name('courses.show');
 });
 
 Route::middleware('auth')->group(function () {
