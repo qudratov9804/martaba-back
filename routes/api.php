@@ -5,9 +5,12 @@ use App\Http\Controllers\Api\V1\Admin\AuditLogController;
 use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\CertificateController as AdminCertificateController;
 use App\Http\Controllers\Api\V1\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Api\V1\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\OrganizationController;
 use App\Http\Controllers\Api\V1\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Api\V1\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Api\V1\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Media\MediaController;
 use App\Http\Controllers\Api\V1\PaymentController;
@@ -22,6 +25,7 @@ use App\Http\Controllers\Api\V1\Student\FavoriteController;
 use App\Http\Controllers\Api\V1\Student\LearningController;
 use App\Http\Controllers\Api\V1\Student\OrderController as StudentOrderController;
 use App\Http\Controllers\Api\V1\Student\QuizAttemptController;
+use App\Http\Controllers\Api\V1\Student\ReviewController as StudentReviewController;
 use App\Http\Controllers\Api\V1\Teacher\AnalyticsController as TeacherAnalyticsController;
 use App\Http\Controllers\Api\V1\Teacher\AssignmentController as TeacherAssignmentController;
 use App\Http\Controllers\Api\V1\Teacher\AssignmentSubmissionController;
@@ -33,6 +37,7 @@ use App\Http\Controllers\Api\V1\Teacher\QuizAnswerController;
 use App\Http\Controllers\Api\V1\Teacher\QuizController as TeacherQuizController;
 use App\Http\Controllers\Api\V1\Teacher\SectionController;
 use App\Http\Controllers\Api\V1\Teacher\StudentController as TeacherStudentController;
+use App\Http\Controllers\Api\V1\Webhooks\ClickWebhookController;
 use App\Http\Controllers\Api\V1\Webhooks\PaymentWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,10 +58,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         Route::get('courses', [PublicCourseController::class, 'index'])->name('courses.index');
         Route::get('courses/{slug}', [PublicCourseController::class, 'show'])->name('courses.show');
+        Route::get('courses/{slug}/reviews', [PublicCourseController::class, 'reviews'])->name('courses.reviews');
     });
 
     Route::get('certificates/verify/{code}', [PublicCertificateController::class, 'verify'])->name('certificates.verify');
 
+    Route::post('webhooks/payments/click', [ClickWebhookController::class, 'handle'])->name('webhooks.payments.click');
     Route::post('webhooks/payments/{provider}', [PaymentWebhookController::class, 'handle'])->name('webhooks.payments');
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -64,6 +71,19 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::apiResource('organizations', OrganizationController::class);
             Route::apiResource('categories', AdminCategoryController::class);
             Route::apiResource('coupons', AdminCouponController::class);
+
+            Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+            Route::get('users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+            Route::put('users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+            Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+            Route::get('courses', [AdminCourseController::class, 'index'])->name('courses.index');
+            Route::get('courses/{course}', [AdminCourseController::class, 'show'])->name('courses.show');
+            Route::post('courses/{course}/publish', [AdminCourseController::class, 'publish'])->name('courses.publish');
+            Route::post('courses/{course}/archive', [AdminCourseController::class, 'archive'])->name('courses.archive');
+
+            Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+            Route::post('reviews/{review}/moderate', [AdminReviewController::class, 'moderate'])->name('reviews.moderate');
 
             Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
             Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
@@ -98,6 +118,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::post('sections/{section}/lessons/reorder', [LessonController::class, 'reorder'])->name('lessons.reorder');
 
             Route::post('lessons/{lesson}/contents', [ContentController::class, 'store'])->name('contents.store');
+            Route::post('lessons/{lesson}/contents/reorder', [ContentController::class, 'reorder'])->name('contents.reorder');
             Route::put('contents/{content}', [ContentController::class, 'update'])->name('contents.update');
             Route::delete('contents/{content}', [ContentController::class, 'destroy'])->name('contents.destroy');
 
@@ -143,6 +164,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
             Route::post('favorites/{course}', [FavoriteController::class, 'store'])->name('favorites.store');
             Route::delete('favorites/{course}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+
+            Route::post('courses/{course}/reviews', [StudentReviewController::class, 'store'])->name('reviews.store');
+            Route::put('reviews/{review}', [StudentReviewController::class, 'update'])->name('reviews.update');
+            Route::delete('reviews/{review}', [StudentReviewController::class, 'destroy'])->name('reviews.destroy');
 
             Route::post('quizzes/{quiz}/attempts', [QuizAttemptController::class, 'store'])->name('quiz-attempts.store');
             Route::get('quiz-attempts/{attempt}', [QuizAttemptController::class, 'show'])->name('quiz-attempts.show');

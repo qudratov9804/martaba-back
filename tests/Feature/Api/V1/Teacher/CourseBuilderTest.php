@@ -51,6 +51,22 @@ test('a teacher can add content blocks to a lesson', function () {
     $response->assertCreated()->assertJsonPath('data.text_content', 'Welcome to the course!');
 });
 
+test('a teacher can reorder content blocks within a lesson', function () {
+    $section = CourseSection::factory()->create(['course_id' => $this->course->id]);
+    $lesson = CourseLesson::factory()->create(['course_id' => $this->course->id, 'section_id' => $section->id]);
+    $first = $lesson->contents()->create(['content_type' => 'text', 'text_content' => 'First', 'sort_order' => 0]);
+    $second = $lesson->contents()->create(['content_type' => 'text', 'text_content' => 'Second', 'sort_order' => 1]);
+
+    $response = $this->withHeaders(bearerHeaderFor($this->teacher))
+        ->postJson("/api/v1/teacher/lessons/{$lesson->id}/contents/reorder", [
+            'content_ids' => [$second->id, $first->id],
+        ]);
+
+    $response->assertOk();
+    expect($second->fresh()->sort_order)->toBe(0);
+    expect($first->fresh()->sort_order)->toBe(1);
+});
+
 test('a teacher can reorder sections within their course', function () {
     $first = CourseSection::factory()->create(['course_id' => $this->course->id, 'sort_order' => 0]);
     $second = CourseSection::factory()->create(['course_id' => $this->course->id, 'sort_order' => 1]);

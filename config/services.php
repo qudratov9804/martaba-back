@@ -39,4 +39,14 @@ return [
         'webhook_secret' => env('MANUAL_GATEWAY_WEBHOOK_SECRET', 'local-testing-secret'),
     ],
 
+    'click' => [
+        'checkout_url' => env('CLICK_CHECKOUT_URL', 'https://my.click.uz/services/pay'),
+        'api_url' => env('CLICK_API_URL', 'https://api.click.uz/v2/merchant'),
+        'service_id' => env('CLICK_SERVICE_ID'),
+        'merchant_id' => env('CLICK_MERCHANT_ID'),
+        'merchant_user_id' => env('CLICK_MERCHANT_USER_ID'),
+        'secret_key' => env('CLICK_SECRET_KEY'),
+        'return_url' => env('CLICK_RETURN_URL'),
+    ],
+
 ];

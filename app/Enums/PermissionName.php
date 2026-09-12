@@ -43,6 +43,9 @@ enum PermissionName: string
     case CouponsUpdate = 'coupons.update';
     case CouponsDelete = 'coupons.delete';
 
+    case ReviewsView = 'reviews.view';
+    case ReviewsModerate = 'reviews.moderate';
+
     case CertificatesView = 'certificates.view';
     case CertificatesIssue = 'certificates.issue';
     case CertificatesRevoke = 'certificates.revoke';

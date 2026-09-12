@@ -19,9 +19,9 @@ class UserResource extends JsonResource
             'organization_id' => $this->organization_id,
             'name' => $this->name,
             'email' => $this->email,
-            'email_verified_at' => $this->email_verified_at?->toIso8601String(),
             'roles' => $this->getRoleNames(),
-            'permissions' => $this->getAllPermissions()->pluck('name'),
+            'email_verified_at' => $this->email_verified_at?->toIso8601String(),
+            'deleted_at' => $this->deleted_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }

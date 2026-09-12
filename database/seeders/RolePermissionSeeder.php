@@ -39,6 +39,8 @@ class RolePermissionSeeder extends Seeder
             PermissionName::CouponsUpdate,
             PermissionName::CertificatesView,
             PermissionName::AnalyticsView,
+            PermissionName::ReviewsView,
+            PermissionName::ReviewsModerate,
         ]));
 
         $student = Role::firstOrCreate(['name' => RoleName::Student->value, 'guard_name' => 'web']);

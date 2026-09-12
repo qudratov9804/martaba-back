@@ -4,13 +4,17 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\OrganizationController as AdminOrganizationController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Teacher\CourseController as TeacherCourseController;
 use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
+use App\Http\Controllers\Teacher\LessonController as TeacherLessonController;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -43,6 +47,9 @@ Route::get('/dashboard', function (Request $request) {
 Route::middleware(['auth', 'verified', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/organizations', [AdminOrganizationController::class, 'index'])->name('organizations.index');
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/courses', [AdminCourseController::class, 'index'])->name('courses.index');
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
     Route::get('/coupons', [AdminCouponController::class, 'index'])->name('coupons.index');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
@@ -57,6 +64,7 @@ Route::middleware(['auth', 'verified', 'role:teacher'])->prefix('teacher')->name
     Route::get('/courses/create', [TeacherCourseController::class, 'create'])->name('courses.create');
     Route::post('/courses', [TeacherCourseController::class, 'store'])->name('courses.store');
     Route::get('/courses/{course}', [TeacherCourseController::class, 'show'])->name('courses.show');
+    Route::get('/lessons/{lesson}', [TeacherLessonController::class, 'show'])->name('lessons.show');
 });
 
 Route::middleware('auth')->group(function () {

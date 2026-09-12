@@ -7,6 +7,8 @@ import {
     Percent,
     Receipt,
     ScrollText,
+    Star,
+    Users,
     Wallet,
 } from 'lucide-vue-next';
 import type { Component } from 'vue';
@@ -32,10 +34,28 @@ export const adminNavigation: NavItem[] = [
         routeName: 'admin.organizations.index',
     },
     {
+        label: 'Users',
+        href: '/admin/users',
+        icon: Users,
+        routeName: 'admin.users.index',
+    },
+    {
         label: 'Categories',
         href: '/admin/categories',
         icon: ListTree,
         routeName: 'admin.categories.index',
+    },
+    {
+        label: 'Courses',
+        href: '/admin/courses',
+        icon: BookOpen,
+        routeName: 'admin.courses.index',
+    },
+    {
+        label: 'Reviews',
+        href: '/admin/reviews',
+        icon: Star,
+        routeName: 'admin.reviews.index',
     },
     {
         label: 'Coupons',

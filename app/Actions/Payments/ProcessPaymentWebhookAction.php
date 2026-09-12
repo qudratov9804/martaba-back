@@ -2,12 +2,8 @@
 
 namespace App\Actions\Payments;
 
-use App\Actions\Enrollments\EnrollStudentAction;
-use App\Enums\EnrollmentSource;
-use App\Enums\OrderStatus;
 use App\Enums\PaymentProvider;
 use App\Enums\PaymentStatus;
-use App\Enums\PaymentTransactionType;
 use App\Enums\WebhookStatus;
 use App\Models\Payment;
 use App\Models\PaymentWebhook;
@@ -18,7 +14,7 @@ class ProcessPaymentWebhookAction
 {
     public function __construct(
         private readonly PaymentGatewayManager $gatewayManager,
-        private readonly EnrollStudentAction $enrollStudentAction,
+        private readonly FinalizePaymentAction $finalizePaymentAction,
     ) {}
 
     /**
@@ -68,58 +64,14 @@ class ProcessPaymentWebhookAction
             }
 
             if ($event->success) {
-                $this->markPaymentSucceeded($payment);
+                $this->finalizePaymentAction->succeed($payment);
             } else {
-                $this->markPaymentFailed($payment, $event->rawPayload);
+                $this->finalizePaymentAction->fail($payment, $event->rawPayload);
             }
 
             $webhook->update(['status' => WebhookStatus::Processed, 'processed_at' => now()]);
 
             return $webhook;
         });
-    }
-
-    private function markPaymentSucceeded(Payment $payment): void
-    {
-        $payment->update(['status' => PaymentStatus::Succeeded, 'paid_at' => now()]);
-
-        $payment->transactions()->create([
-            'type' => PaymentTransactionType::Capture,
-            'status' => PaymentStatus::Succeeded->value,
-            'amount_minor' => $payment->amount_minor,
-            'currency' => $payment->currency,
-            'processed_at' => now(),
-            'created_at' => now(),
-        ]);
-
-        $order = $payment->order;
-        $order->update(['status' => OrderStatus::Paid, 'paid_at' => now()]);
-
-        foreach ($order->items as $item) {
-            $enrollment = $this->enrollStudentAction->handle($order->student, $item->course, EnrollmentSource::Purchase);
-            $enrollment->update(['order_id' => $order->id]);
-        }
-    }
-
-    /**
-     * @param  array<string, mixed>  $rawPayload
-     */
-    private function markPaymentFailed(Payment $payment, array $rawPayload): void
-    {
-        $payment->update([
-            'status' => PaymentStatus::Failed,
-            'failed_at' => now(),
-            'failure_code' => $rawPayload['failure_code'] ?? null,
-            'failure_message' => $rawPayload['failure_message'] ?? null,
-        ]);
-
-        $payment->transactions()->create([
-            'type' => PaymentTransactionType::Payment,
-            'status' => PaymentStatus::Failed->value,
-            'amount_minor' => $payment->amount_minor,
-            'currency' => $payment->currency,
-            'processed_at' => now(),
-            'created_at' => now(),
-        ]);
     }
 }

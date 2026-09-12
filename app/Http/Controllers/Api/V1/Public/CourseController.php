@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1\Public;
 
 use App\Enums\CourseStatus;
 use App\Enums\CourseVisibility;
+use App\Enums\ReviewStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CourseResource;
+use App\Http\Resources\ReviewResource;
 use App\Models\Course;
 use App\Models\Organization;
 use App\Support\ApiResponse;
@@ -51,5 +53,22 @@ class CourseController extends Controller
         ])])->firstOrFail();
 
         return ApiResponse::success(new CourseResource($course), 'Course loaded.');
+    }
+
+    public function reviews(string $slug, Request $request): JsonResponse
+    {
+        $course = Course::query()
+            ->where('slug', $slug)
+            ->where('status', CourseStatus::Published)
+            ->where('visibility', CourseVisibility::Public)
+            ->firstOrFail();
+
+        $reviews = $course->reviews()
+            ->where('status', ReviewStatus::Published)
+            ->with('student')
+            ->orderByDesc('created_at')
+            ->paginate($request->integer('per_page', 20));
+
+        return ApiResponse::success(ReviewResource::collection($reviews), 'Reviews loaded.');
     }
 }

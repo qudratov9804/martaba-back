@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'pricing_type', 'price_minor', 'discount_price_minor', 'currency',
     'status', 'visibility',
     'featured', 'certificate_enabled', 'reviews_enabled',
+    'rating_average', 'rating_count',
     'estimated_duration_minutes', 'published_at',
     'seo_title', 'seo_description', 'seo_keywords',
     'completion_rules_json', 'settings_json', 'metadata_json',
@@ -40,6 +41,8 @@ class Course extends Model
             'featured' => 'boolean',
             'certificate_enabled' => 'boolean',
             'reviews_enabled' => 'boolean',
+            'rating_average' => 'float',
+            'rating_count' => 'integer',
             'published_at' => 'datetime',
             'completion_rules_json' => 'array',
             'settings_json' => 'array',
@@ -119,6 +122,14 @@ class Course extends Model
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
+    }
+
+    /**
+     * @return HasMany<Review, $this>
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 
     /**

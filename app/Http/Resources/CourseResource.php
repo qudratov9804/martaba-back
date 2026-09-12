@@ -36,6 +36,8 @@ class CourseResource extends JsonResource
             'featured' => $this->featured,
             'certificate_enabled' => $this->certificate_enabled,
             'reviews_enabled' => $this->reviews_enabled,
+            'rating_average' => $this->rating_average,
+            'rating_count' => $this->rating_count,
             'estimated_duration_minutes' => $this->estimated_duration_minutes,
             'published_at' => $this->published_at?->toIso8601String(),
             'seo_title' => $this->seo_title,

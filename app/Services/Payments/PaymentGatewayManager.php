@@ -15,6 +15,7 @@ class PaymentGatewayManager
     {
         return match ($provider) {
             PaymentProvider::Manual => $this->container->make(ManualPaymentGateway::class),
+            PaymentProvider::Click => $this->container->make(ClickPaymentGateway::class),
             default => throw new InvalidArgumentException(
                 "No payment gateway adapter is registered for provider [{$provider->value}] yet."
             ),

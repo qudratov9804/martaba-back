@@ -2,6 +2,7 @@
 import { Badge } from '@/Components/ui/badge';
 import { apiErrorMessage } from '@/lib/api';
 import type { Lesson } from '@/types/course';
+import { Link } from '@inertiajs/vue3';
 import {
     ArrowDown,
     ArrowUp,
@@ -13,6 +14,7 @@ import {
     Music,
     Presentation,
     Radio,
+    Settings,
     Trash2,
     Video,
 } from 'lucide-vue-next';
@@ -95,6 +97,13 @@ async function destroy() {
         </div>
 
         <div class="flex shrink-0 items-center gap-1">
+            <Link
+                :href="route('teacher.lessons.show', lesson.id)"
+                class="text-muted-foreground hover:bg-accent rounded p-1"
+                title="Manage content"
+            >
+                <Settings class="h-3.5 w-3.5" />
+            </Link>
             <button
                 type="button"
                 class="text-muted-foreground hover:bg-accent rounded p-1 disabled:opacity-30"

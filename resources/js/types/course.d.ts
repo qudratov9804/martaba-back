@@ -15,6 +15,40 @@ export type LessonType =
     | 'code'
     | 'html';
 
+export type ContentType =
+    | 'text'
+    | 'video'
+    | 'audio'
+    | 'pdf'
+    | 'image'
+    | 'embed'
+    | 'download'
+    | 'external_link';
+
+export interface Media {
+    id: number;
+    original_name: string;
+    mime_type: string;
+    extension: string;
+    size: number;
+    visibility: 'public' | 'private';
+    url: string | null;
+    created_at: string;
+}
+
+export interface ContentBlock {
+    id: number;
+    lesson_id: number;
+    content_type: ContentType;
+    text_content: string | null;
+    media_id: number | null;
+    media: Media | null;
+    external_url: string | null;
+    embed_code: string | null;
+    sort_order: number;
+    created_at: string;
+}
+
 export interface Lesson {
     id: number;
     course_id: number;
@@ -28,6 +62,9 @@ export interface Lesson {
     is_required: boolean;
     is_published: boolean;
     estimated_duration_minutes: number | null;
+    contents?: ContentBlock[];
+    course?: { id: number; title: string };
+    section?: { id: number; title: string };
 }
 
 export interface Section {

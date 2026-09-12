@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1\Teacher;
 
+use App\Actions\Courses\ReorderContentsAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Teacher\ReorderContentsRequest;
 use App\Http\Requests\Teacher\StoreContentRequest;
 use App\Http\Resources\CourseContentResource;
 use App\Models\CourseContent;
@@ -19,6 +21,18 @@ class ContentController extends Controller
         $content = $lesson->contents()->create($request->validated());
 
         return ApiResponse::success(new CourseContentResource($content), 'Content block added.', status: 201);
+    }
+
+    public function reorder(ReorderContentsRequest $request, CourseLesson $lesson, ReorderContentsAction $action): JsonResponse
+    {
+        $this->authorize('manageContent', $lesson->course);
+
+        $action->handle($lesson, $request->validated('content_ids'));
+
+        return ApiResponse::success(
+            CourseContentResource::collection($lesson->contents()->orderBy('sort_order')->get()),
+            'Content blocks reordered.',
+        );
     }
 
     public function update(StoreContentRequest $request, CourseContent $content): JsonResponse

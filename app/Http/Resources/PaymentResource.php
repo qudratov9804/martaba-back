@@ -22,6 +22,7 @@ class PaymentResource extends JsonResource
             'amount_minor' => $this->amount_minor,
             'currency' => $this->currency,
             'provider_payment_id' => $this->provider_payment_id,
+            'checkout_url' => $this->metadata_json['checkout_url'] ?? null,
             'failure_code' => $this->failure_code,
             'failure_message' => $this->failure_message,
             'paid_at' => $this->paid_at?->toIso8601String(),
